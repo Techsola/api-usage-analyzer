@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request: ~
+  workflow_dispatch: ~
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build and test
+      run: dotnet test -c Release /bl:artifacts\Logs\test.binlog
+
+    - name: Upload logs artifact
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: Logs
+        path: artifacts/Logs

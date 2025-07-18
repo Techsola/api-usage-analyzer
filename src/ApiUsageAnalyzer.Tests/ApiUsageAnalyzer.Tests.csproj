@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0-windows</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Shouldly" Version="4.3.0" />
+    <PackageReference Include="Spectre.Console.Testing" Version="0.50.0" />
+    <PackageReference Include="TUnit" Version="0.25.21" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ApiUsageAnalyzer\ApiUsageAnalyzer.csproj" />
+  </ItemGroup>
+
+</Project>
