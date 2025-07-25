@@ -98,10 +98,13 @@ ARGUMENTS:
 
 OPTIONS:
     -h, --help                              Prints help information
+        --gh <USERS>                        The GitHub users which own the repositories to be
+                                            discovered. Repeat --gh to specify more than one.
+                                            Currently, only public repositories are supported
         --azdo <URLS>                       The Azure DevOps project collection URLs from which
                                             repositories are discovered. Repeat --azdo to specify
-                                            more than one URL. Currently, only Git repositories and
-                                            only the Azure DevOps platform are supported
+                                            more than one. Currently, only Git repositories are
+                                            supported
         --defining-repo-name <NAME>         If specified, only repositories with this name will be
                                             searched for the project that defines the API assembly
         --defining-repo-url <URL>           The remote URL of an repository containing the project

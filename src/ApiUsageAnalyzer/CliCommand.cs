@@ -19,8 +19,12 @@ public sealed class CliCommand : AsyncCommand<CliCommand.Settings>
         [Description("The name of the assembly defining the APIs whose usage will be reported")]
         public required string AssemblyName { get; set; }
 
+        [CommandOption("--gh <users>")]
+        [Description("The GitHub users which own the repositories to be discovered. Repeat --gh to specify more than one. Currently, only public repositories are supported.")]
+        public string[] GitHubUsers { get; set; } = [];
+
         [CommandOption("--azdo <urls>")]
-        [Description("The Azure DevOps project collection URLs from which repositories are discovered. Repeat --azdo to specify more than one URL. Currently, only Git repositories and only the Azure DevOps platform are supported.")]
+        [Description("The Azure DevOps project collection URLs from which repositories are discovered. Repeat --azdo to specify more than one. Currently, only Git repositories are supported.")]
         public string[] AzureDevOpsProjectCollections { get; set; } = [];
 
         [CommandOption("--defining-repo-name <name>")]
@@ -71,11 +75,15 @@ public sealed class CliCommand : AsyncCommand<CliCommand.Settings>
         {
             try
             {
-                Console.WriteLine("Loading Azure DevOps repositories...");
+                Console.WriteLine("Discovering repositories...");
 
-                var codeRepositories = (await Task.WhenAll(
-                        from url in settings.AzureDevOpsProjectCollections
-                        select AzureDevOps.GetRepositoriesAsync(url, new VssCredentials(), cancellationToken)))
+                var repositoryLoadTasks =
+                    settings.AzureDevOpsProjectCollections.Select(url =>
+                        SourceControlHosts.GetAzureDevOpsRepositoriesAsync(url, new VssCredentials(), cancellationToken))
+                    .Concat(settings.GitHubUsers.Select(owner =>
+                        SourceControlHosts.GetGitHubPublicRepositoriesAsync(owner, cancellationToken)));
+
+                var codeRepositories = (await Task.WhenAll(repositoryLoadTasks))
                     .SelectMany(repositories => repositories)
                     .ToImmutableArray();
 

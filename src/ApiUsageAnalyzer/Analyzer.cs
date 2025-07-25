@@ -210,7 +210,7 @@ internal sealed class Analyzer(
 
                     if (!referencesAssembly)
                     {
-                        Console.WriteLine($"Project {project.FilePath} has no direct dependency on {settings.AssemblyName} for target {targetFramework}, analyzing usage");
+                        Console.WriteLine($"Project {project.FilePath} has no direct dependency on {settings.AssemblyName} for target {targetFramework}");
                         continue;
                     }
 
