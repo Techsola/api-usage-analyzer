@@ -33,7 +33,11 @@ public static class FindAllReferences
             cancellationToken.ThrowIfCancellationRequested();
 
             foreach (var attribute in symbol.GetAttributes())
-                VisitReference(attribute.AttributeClass, symbol, [attribute.ApplicationSyntaxReference!]);
+            {
+                var syntax = attribute.ApplicationSyntaxReference!.GetSyntax(cancellationToken);
+                var operation = compilation.GetSemanticModel(syntax.SyntaxTree).GetOperation(syntax);
+                new ReferenceDependencyOperationWalker(this, symbol).Visit(operation);
+            }
         }
 
         public override void VisitAssembly(IAssemblySymbol symbol)
