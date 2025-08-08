@@ -18,7 +18,7 @@ internal sealed class Analyzer(
         SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
         ~SymbolDisplayGenericsOptions.None,
         SymbolDisplayMemberOptions.IncludeParameters | SymbolDisplayMemberOptions.IncludeContainingType,
-        SymbolDisplayDelegateStyle.NameAndSignature,
+        SymbolDisplayDelegateStyle.NameOnly,
         SymbolDisplayExtensionMethodStyle.StaticMethod,
         ~SymbolDisplayParameterOptions.None,
         SymbolDisplayPropertyStyle.NameOnly,
