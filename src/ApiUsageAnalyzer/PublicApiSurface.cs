@@ -43,23 +43,26 @@ public static class PublicApiSurface
         {
             base.VisitNamedType(symbol);
 
-            var members = symbol.GetMembers();
-            var membersToVisit = members.ToList();
-
-            foreach (var @event in members.OfType<IEventSymbol>())
+            if (symbol.TypeKind is not TypeKind.Delegate)
             {
-                if (@event.AddMethod is not null)
-                    membersToVisit.Remove(@event.AddMethod);
-                if (@event.RemoveMethod is not null)
-                    membersToVisit.Remove(@event.RemoveMethod);
-            }
+                var members = symbol.GetMembers();
+                var membersToVisit = members.ToList();
 
-            foreach (var member in membersToVisit)
-            {
-                if (member.DeclaredAccessibility is Accessibility.Public or Accessibility.Protected or Accessibility.ProtectedOrInternal)
+                foreach (var @event in members.OfType<IEventSymbol>())
                 {
-                    Report(member);
-                    Visit(member);
+                    if (@event.AddMethod is not null)
+                        membersToVisit.Remove(@event.AddMethod);
+                    if (@event.RemoveMethod is not null)
+                        membersToVisit.Remove(@event.RemoveMethod);
+                }
+
+                foreach (var member in membersToVisit)
+                {
+                    if (member.DeclaredAccessibility is Accessibility.Public or Accessibility.Protected or Accessibility.ProtectedOrInternal)
+                    {
+                        Report(member);
+                        Visit(member);
+                    }
                 }
             }
         }
