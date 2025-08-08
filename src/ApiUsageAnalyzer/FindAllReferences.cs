@@ -394,6 +394,9 @@ public static class FindAllReferences
             {
                 base.VisitEventReference(operation);
 
+                if (operation.Syntax is MemberAccessExpressionSyntax memberAccess)
+                    VisitIfExplicitStaticReceiver(operation.SemanticModel!, memberAccess);
+
                 declarationVisitor.VisitReference(operation.Event, declaringSymbol, () => [operation.Syntax switch
                 {
                     MemberAccessExpressionSyntax memberAccess => memberAccess.Name.GetLocation(),
@@ -404,6 +407,9 @@ public static class FindAllReferences
             public override void VisitFieldReference(IFieldReferenceOperation operation)
             {
                 base.VisitFieldReference(operation);
+
+                if (operation.Syntax is MemberAccessExpressionSyntax memberAccess)
+                    VisitIfExplicitStaticReceiver(operation.SemanticModel!, memberAccess);
 
                 declarationVisitor.VisitReference(operation.Field, declaringSymbol, () => [operation.Syntax switch
                 {
@@ -416,12 +422,22 @@ public static class FindAllReferences
             {
                 base.VisitInvocation(operation);
 
+                if (operation.Syntax is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax memberAccess })
+                    VisitIfExplicitStaticReceiver(operation.SemanticModel!, memberAccess);
+
                 declarationVisitor.VisitReference(operation.TargetMethod, declaringSymbol, () => [operation.Syntax switch
                 {
                     InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax memberAccess } => memberAccess.Name.GetLocation(),
                     InvocationExpressionSyntax invocation => invocation.Expression.GetLocation(),
                     _ => operation.Syntax.GetLocation(),
                 }]);
+            }
+
+            private void VisitIfExplicitStaticReceiver(SemanticModel semanticModel, MemberAccessExpressionSyntax syntax)
+            {
+                var symbolInfo = semanticModel.GetSymbolInfo(syntax.Expression, declarationVisitor.cancellationToken);
+                if (symbolInfo.Symbol is ITypeSymbol type)
+                    declarationVisitor.VisitReference(type, declaringSymbol, () => [syntax.Expression.GetLocation()]);
             }
 
             public override void VisitIsType(IIsTypeOperation operation)
@@ -460,6 +476,9 @@ public static class FindAllReferences
             public override void VisitPropertyReference(IPropertyReferenceOperation operation)
             {
                 base.VisitPropertyReference(operation);
+
+                if (operation.Syntax is MemberAccessExpressionSyntax memberAccess)
+                    VisitIfExplicitStaticReceiver(operation.SemanticModel!, memberAccess);
 
                 switch (operation.Parent)
                 {
