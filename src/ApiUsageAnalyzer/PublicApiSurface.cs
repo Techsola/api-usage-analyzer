@@ -58,6 +58,12 @@ public static class PublicApiSurface
 
                 foreach (var member in membersToVisit)
                 {
+                    if (symbol.TypeKind == TypeKind.Enum && member is IMethodSymbol { MethodKind: MethodKind.Constructor, Parameters: [], IsStatic: false })
+                    {
+                        // Skip enum default constructors
+                        continue;
+                    }
+
                     if (member.DeclaredAccessibility is Accessibility.Public or Accessibility.Protected or Accessibility.ProtectedOrInternal)
                     {
                         Report(member);
